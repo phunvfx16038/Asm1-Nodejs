@@ -1,0 +1,26 @@
+.wrap{
+    padding:20px;
+    font-size: 18px;
+}
+.wrap h2 {
+    text-align: center;
+}
+
+.info-form{
+    width: 20rem;
+    max-width: 90%;
+    margin: auto;
+    display: block;
+}
+
+.btn{
+    padding:10px;
+    background-color: rgb(80, 248, 80);
+    border: none;
+    cursor: pointer;
+    margin-top: 5px;
+    font-size: 18px;
+}
+input{
+    padding:10px
+}

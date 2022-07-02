@@ -1,0 +1,198 @@
+<%- include('./includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/checkin.css">
+
+    </head>
+
+    <body>
+        <style>
+            td p {
+                margin-bottom: 5px;
+                text-align: center;
+            }
+
+            #selectMonth {
+                padding: 8px
+            }
+        </style>
+        <div class="container">
+            <div><a href="/">Back</a></div>
+            <h2>Thông tin giờ làm</h2>
+            <%if(timesheet){%>
+                <table>
+                    <tr>
+                        <td>Ngày</td>
+                        <td>Thời gian bắt đầu</td>
+                        <td>Thời gian kết thúc</td>
+                        <td>Nơi làm việc</td>
+                        <td>Số giờ đã làm</td>
+                        <td>Các ngày đã nghỉ</td>
+                        <%if(totalTimeInDay>= 28800){%>
+                            <td>Số giờ làm trong ngày</td>
+                            <%}%>
+                                <%if(overTime !=="0" ){%>
+                                    <td>Số giờ làm thêm</td>
+                                    <%}%>
+                    </tr>
+                    <tr>
+                        <td>
+                            <%= timesheet.date%>
+                        </td>
+                        <td>
+                            <%= timesheet.startWork%>
+                        </td>
+                        <td>
+                            <%= timesheet.endWork%>
+                        </td>
+                        <td>
+                            <%= timesheet.workPlace %>
+                        </td>
+                        <%if(timesheet.workTime){%>
+                            <td class="time">
+                                <%= covertTimeFunction(timesheet.workTime) %>
+                            </td>
+                            <%}else{%>
+                                <td class="time">
+                                    Chưa kết thúc
+                                </td>
+                                <%}%>
+
+                                    <%if(dayOff.length !==0){%>
+                                        <td class="time">
+                                            <% dayOff.forEach(function(day){ %>
+                                                <p>
+                                                    <%=day.dateoff%>
+                                                </p>
+                                                <%})%>
+                                        </td>
+                                        <%}else{%>
+                                            <td class="time">
+                                                Chưa đăng ký ngày nghỉ phép
+
+                                            </td>
+                                            <%}%>
+                                                <%if(totalTimeInDay>= 28800 ){%>
+                                                    <td>
+                                                        <%= covertTimeFunction(totalTimeInDay)%>
+                                                    </td>
+                                                    <%}%>
+                                                        <%if(overTime !=="0" ){%>
+                                                            <td>
+                                                                <%= covertTimeFunction(overTime)%>
+                                                            </td>
+                                                            <%}%>
+                    </tr>
+                </table>
+
+                <div id="showSalary" data-scale="<%= salaryScale%>">
+                    <label for="select">Xem thông tin lương theo tháng: </label>
+                    <select name="selectMonth" id="selectMonth">
+                        <option> Tháng</option>
+                        <% listMonth.forEach(function(month){ %>
+                            <option value="<%= month.month%>">
+                                <%= month.month%>
+                            </option>
+                            <%})%>
+                    </select>
+                    <div id="salary">
+                        <h2>Thông tin bảng lương</h2>
+                        <table>
+                            <tr>
+                                <td>Hệ số lương</td>
+                                <td>Số giờ làm thêm</td>
+                                <td>Số giờ bị thiếu</td>
+                                <td>Tiền lương</td>
+                            </tr>
+                            <tr>
+                                <td class="scale"></td>
+                                <td class="overtime"></td>
+                                <td class="missingTime"></td>
+                                <td class="salaryTotal"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <%}else{%>
+                    <p>Bạn chưa đăng ký giờ làm</p>
+                    <%}%>
+
+        </div>
+
+        <script>
+            const selectEl = document.getElementById("selectMonth")
+            const showSalaryEl = document.getElementById("showSalary")
+            const listmonthObj = showSalaryEl.dataset.month
+
+            const salaryScale = showSalaryEl.dataset.scale
+            const salaryEl = document.getElementById("salary")
+
+            const listMonthObj = '<%- JSON.stringify(listMonth) %>';
+            const listMonth = JSON.parse(listMonthObj)
+
+            const calculateSalary = (value) => {
+                let salary = 0
+                const indexMonth = listMonth.findIndex(month => {
+                    return month.month === value.toString()
+                })
+
+                if (indexMonth !== -1) {
+                    const missingTime = calculateMissingTime(listMonth[indexMonth].working)
+                    salary = parseInt(salaryScale) * 3000000 + (parseInt(listMonth[indexMonth].overTimeInMonth) - missingTime) * 200000
+                    displaySalaryInfo(salaryScale, listMonth[indexMonth].overTimeInMonth, missingTime, salary)
+                }
+
+            }
+
+            const displaySalaryInfo = (salaryScale, overTime, missingTime, salary) => {
+                const scaleEl = document.getElementsByClassName("scale")[0]
+                const overTimeEl = document.getElementsByClassName("overtime")[0]
+                const missingTimeEl = document.getElementsByClassName("missingTime")[0]
+                const salaryTotalEl = document.getElementsByClassName("salaryTotal")[0]
+
+                scaleEl.innerHTML = salaryScale;
+                overTimeEl.innerHTML = covertSecondsToHoursAndMin(overTime);
+                missingTimeEl.innerHTML = covertSecondsToHoursAndMin(missingTime);
+                salaryTotalEl.innerHTML = salary;
+            }
+
+            const calculateMissingTime = (worktime) => {
+                const missTimeList = worktime.filter((missingTime => {
+                    return parseInt(missingTime.totalWorkTimeInDay) < 28800
+                }))
+
+                const missTime = missTimeList.reduce((total, current) => {
+                    return total = total + (28800 - parseInt(current.totalWorkTimeInDay))
+                }, 0)
+
+                return missTime
+            }
+
+            selectEl.onchange = () => {
+                const selectedValue = selectEl.value
+                calculateSalary(selectedValue)
+            }
+
+            const covertSecondsToHoursAndMin = (seconds) => {
+                let duration = seconds;
+                let hours = duration / 3600;
+                duration = duration % 3600;
+
+                let min = parseInt(duration / 60);
+                duration = duration % 60;
+
+                let sec = parseInt(duration);
+
+                if (sec < 10) {
+                    sec = `0${sec}`;
+                }
+                if (min < 10) {
+                    min = `0${min}`;
+                }
+                if (parseInt(hours, 10) > 0) {
+                    return `${parseInt(hours, 10)} hours ${min} minutes ${sec} seconds`;
+                }
+                return ` ${min} minutes ${sec} seconds`;
+            };
+        </script>
+    </body>

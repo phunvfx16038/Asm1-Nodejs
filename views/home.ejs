@@ -1,0 +1,161 @@
+<%- include('./includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/checkin.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            <h2 class="title">Ứng dụng quản lý thời gian và lịch làm việc</h2>
+            <ul class="list">
+                <%if (staff.state){%>
+                    <li class="list-item check-out">
+                        <form action="/" method="POST">
+                            <button class="btn-checout">Kết thúc làm</button>
+                        </form>
+                    </li>
+                    <%}else{%>
+                        <li class="list-item check-in"><a href="/">Điểm danh</a></li>
+                        <%}%>
+                            <li class="list-item absent"><a href="/">Nghỉ phép</a></li>
+                            <li class="list-item"><a href="/info">Thông tin cá nhân</a></li>
+                            <li class="list-item"><a href="/timelist">Giờ làm</a></li>
+                            <li class="list-item"><a href="/covidInfo">Thông tin Covid</a></li>
+            </ul>
+            <div>
+                <p>Trạng thái:
+                    <% if(staff.state){ %>
+                        <span>Đang làm việc</span>
+                        <%} else {%>
+                            <span>Kết thúc làm việc</span>
+                            <%}%>
+                </p>
+            </div>
+
+            <div class="row">
+                <%if (data !==null){%>
+                    <div>
+                        <h2>Thông tin lượt đăng ký hiện tại</h2>
+                        <table>
+                            <tr>
+                                <td>Họ tên</td>
+                                <td>Nơi làm việc</td>
+                                <td>Thời gian bắt đầu</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <%= staff.name %>
+                                </td>
+                                <td>
+                                    <%= data.workPlace %>
+                                </td>
+                                <td>
+                                    <%= data.startWork %>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <%}%>
+
+                        <%if(lists){%>
+                            <div>
+                                <h2>Danh sách các lượt đăng ký làm </h2>
+                                <table>
+                                    <tr>
+                                        <td>STT</td>
+                                        <td>Thời gian bắt đầu</td>
+                                        <td>Thời gian kết thúc</td>
+                                        <td>Nơi làm việc</td>
+                                    </tr>
+                                    <% lists.forEach(function(list,index){ %>
+                                        <tr>
+                                            <td>
+                                                <%= index + 1%>
+                                            </td>
+                                            <td>
+                                                <%= list.startWork%>
+                                            </td>
+                                            <td>
+                                                <%= list.endWork%>
+                                            </td>
+                                            <td>
+                                                <%= list.workPlace %>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                </table>
+
+                                <p>Tổng thời gian làm việc: <%= covertTimeFunction(totalWorkedTime) %>
+                                </p>
+                            </div>
+                            <%}%>
+            </div>
+        </div>
+        <div class="modal" id="checkin-modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <h2>Điểm danh</h2>
+                </div>
+                <div class="modal-body">
+                    <form action="/" method="POST">
+                        <p>Tên: <%= staff.name%>
+                        </p>
+                        <div class="select-workplace">
+                            <label>Nơi làm việc:</label>
+                            <select name="workplace" id="workplace">
+                                <option value="Công ty">Công ty</option>
+                                <option value="Nhà">Nhà</option>
+                                <option value="Khách hàng">Khách hàng</option>
+                            </select>
+                        </div>
+                        <% if(staff.state){ %>
+                            <button class="btn" disabled>Submit</button>
+                            <%} else {%>
+                                <button class="btn">Submit</button>
+                                <%}%>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- checkout modal -->
+
+        <!-- Absent modal -->
+        <div class="modal" id="absent-modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <h2>Đăng ký nghỉ phép</h2>
+                </div>
+                <div class="modal-body">
+                    <form action="/absent" class="absent-form" method="POST">
+                        <div class="form-control">
+                            <label for="">Chọn ngày nghỉ</label>
+                            <div id="datePicker">
+                                <input name="absentDateTime" type="text" class="datetime" placeholder="Select Date.."
+                                    data-input>
+                            </div>
+                        </div>
+                        <div class="form-control">
+                            <label for="">Lý do</label>
+                            <textarea name="reason" cols="30" rows="10"></textarea>
+                        </div>
+
+                        <button class="btn">Submit</button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- absent modal -->
+    </body>
+
+    <script src="/js/showPopup.js"></script>

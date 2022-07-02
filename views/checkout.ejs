@@ -1,0 +1,42 @@
+<%- include('./includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/checkin.css">
+    </head>
+
+    <body>
+        <div class="container">
+            <div><a href="/">Back</a></div>
+
+            <table>
+                <tr>
+                    <td>STT</td>
+                    <td>Thời gian bắt đầu</td>
+                    <td>Thời gian kết thúc</td>
+                    <td>Nơi làm việc</td>
+                    <td>Số giờ đã làm</td>
+                </tr>
+                <% lists.forEach(function(list,index){ %>
+                    <tr>
+                        <td>
+                            <%= index + 1%>
+                        </td>
+                        <td>
+                            <%= list.startWork%>
+                        </td>
+                        <td>
+                            <%= list.endWork%>
+                        </td>
+                        <td>
+                            <%= list.workPlace %>
+                        </td>
+                        <td class="time">
+                            <%= covertTimeFunction(list.workTime) %>
+                        </td>
+                    </tr>
+                    <% }); %>
+            </table>
+
+            <p>Tổng thời gian làm việc: <%=totalWorkedTime%>
+            </p>
+        </div>
+    </body>
