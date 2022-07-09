@@ -1,0 +1,30 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/checkin.css">
+    </head>
+
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+            <div class="container">
+                <h2>Thông tin lượt đăng ký hiện tại</h2>
+                <table>
+                    <tr>
+                        <td>Họ tên</td>
+                        <td>Nơi làm việc</td>
+                        <td>Thời gian bắt đầu</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <%= name%>
+                        </td>
+                        <td>
+                            <%= timesheet.workPlace%>
+                        </td>
+                        <td>
+                            <%= timesheet.startWork %>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <%- include('../includes/end.ejs') %>

@@ -1,0 +1,47 @@
+<div class="backdrop"></div>
+<header class="main-header">
+    <button id="side-menu-toggle">Menu</button>
+    <nav class="main-header__nav">
+        <ul class="main-header__item-list">
+            <li class="main-header__item">
+                <a class="<%= path === '/' ? 'active' : '' %>" href="/timesheet">Quản lý giờ làm</a>
+            </li>
+            <li class="main-header__item">
+                <a class="<%= path === '/info' ? 'active' : '' %>" href="/profile/info">Thông tin cá nhân</a>
+            </li>
+            <li class="main-header__item">
+                <a class="<%= path === '/timelist' ? 'active' : '' %>" href="/timelist">Thông tin giờ làm</a>
+            </li>
+            <li class="main-header__item">
+                <a class="<%= path === '/covid' ? 'active' : '' %>" href="/covid">Thông tin Covid</a>
+            </li>
+        </ul>
+    </nav>
+    <%if(path==='/timelist' ){%>
+        <div class="column">
+            <form action="/timelist/search" method="POST">
+                <div class="search">
+                    <input type="text" name="search">
+                    <button>Search</button>
+                </div>
+            </form>
+        </div>
+        <%}%>
+</header>
+
+<nav class="mobile-nav">
+    <ul class="mobile-nav__item-list">
+        <li class="mobile-nav__item">
+            <a class="<%= path === '/' ? 'active' : '' %>" href="/timesheet">Quản lý giờ làm</a>
+        </li>
+        <li class="mobile-nav__item">
+            <a class="<%= path === '/info' ? 'active' : '' %>" href="/profile/info">Thông tin cá nhân</a>
+        </li>
+        <li class="mobile-nav__item">
+            <a class="<%= path === '/timelist' ? 'active' : '' %>" href="/timelist">Thông tin giờ làm</a>
+        </li>
+        <li class="mobile-nav__item">
+            <a class="<%= path === '/covid' ? 'active' : '' %>" href="/covid">Thông tin Covid</a>
+        </li>
+    </ul>
+</nav>

@@ -1,0 +1,40 @@
+<%- include('./includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/info.css">
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="wrap">
+                <form action="/login" class="info-form" method="POST">
+                    <div class="form-control">
+                        <label for="">Email</label>
+                        <input name="email"></input>
+                    </div>
+                    <div class="form-control">
+                        <label for="">Mật khẩu</label>
+                        <input name="password"></input>
+                    </div>
+                    <button class="btn">Đăng nhập</button>
+                </form>
+            </div>
+
+        </div>
+    </body>
+    <script>
+        const nativeElement = document.getElementById('datePicker');
+        const config = {
+            wrap: true,
+            dateFormat: "d/m/Y H:i",
+            altFormat: "d/m/Y H:i",
+            enableTime: true,
+            allowInput: true,
+            mode: "multiple",
+            time_24hr: true,
+            minTime: "1:00",
+            maxTime: "8:00"
+        };
+        flatpickr(nativeElement, config);
+
+    </script>

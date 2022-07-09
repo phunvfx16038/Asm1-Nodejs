@@ -1,0 +1,103 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/info.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    </head>
+
+    <body>
+        <style>
+            .row {
+                display: flex;
+                margin-bottom: 10px;
+            }
+
+            .col {
+                width: 50%;
+                display: inline-block;
+                margin-right: 10px;
+            }
+
+            .col label {
+                display: block;
+                margin: 10px 0px;
+            }
+
+            .btn {
+                margin-top: 20px;
+            }
+        </style>
+
+        <%- include('../includes/navigation.ejs') %>
+            <div class="container">
+                <div class="wrap">
+                    <h2>Đăng ký thông tin Covid</h2>
+                    <div class="wrap-info">
+                        <form class="info-form" action="/covid" method="POST">
+                            <div class="form-control">
+                                <label for="title">Thân nhiệt</label>
+                                <input type="number" name="temp" min="35" max="44" step="0.1">
+                            </div>
+                            <div class="form-control">
+                                <label for="title">Ngày</label>
+                                <div id="datePickerCovid">
+                                    <input name="covidDateTime" type="text" class="datetime" placeholder="Select Date.."
+                                        data-input>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="title">Ngày tiêm mũi 1</label>
+                                    <input type="date" name="vaccine1">
+                                </div>
+                                <div class="col">
+                                    <label for="title">Loại Vaccine </label>
+                                    <input type="text" name="vaccineType1">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="title">Ngày tiêm mũi 2</label>
+                                    <input type="date" name="vaccine2">
+                                </div>
+                                <div class="col">
+                                    <label for="title">Loại Vaccine </label>
+                                    <input type="text" name="vaccineType2">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <label for="title">Ngày tiêm mũi 3</label>
+                                    <input type="date" name="vaccine3">
+                                </div>
+                                <div class="col">
+                                    <label for="title">Loại Vaccine </label>
+                                    <input type="text" name="vaccineType3">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="title"> Bạn đã từng dương tính với Covid chưa? </label>
+                                <input type="checkbox" id="myCheck" name="checkCovid">
+                            </div>
+                            <button class="btn">Submit</button>
+                        </form>
+                    </div>
+                </div>
+
+
+            </div>
+            <script>
+                const datePockerCovidEl = document.getElementById('datePickerCovid');
+                const config = {
+                    wrap: true,
+                    dateFormat: "d/m/Y H:i",
+                    enableTime: true,
+                    allowInput: true,
+                    time_24hr: true,
+                };
+                flatpickr(datePockerCovidEl, config);
+
+            </script>
+            <%- include('../includes/end.ejs') %>

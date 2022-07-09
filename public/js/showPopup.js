@@ -25,8 +25,8 @@ closeElCheckin.addEventListener("click", closeModal);
 const nativeElement = document.getElementById("datePicker");
 const config = {
   wrap: true,
-  dateFormat: "n/j/Y H:i",
-  altFormat: "n/j/Y H:i",
+  dateFormat: "d/m/Y H:i",
+  altFormat: "d/m/Y H:i",
   enableTime: true,
   allowInput: true,
   mode: "multiple",

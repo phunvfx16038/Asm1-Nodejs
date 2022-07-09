@@ -1,0 +1,48 @@
+<%- include('./includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/info.css">
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="wrap">
+                <form action="/register" class="info-form" method="POST">
+                    <div class="form-control">
+                        <label for="">Email</label>
+                        <input name="email"></input>
+                    </div>
+                    <div class="form-control">
+                        <label for="">Mật khẩu</label>
+                        <input name="password" type="password"></input>
+                    </div>
+                    <div class="form-control">
+                        <label for="title">Họ và tên</label>
+                        <input class="" type="text" name="name">
+                    </div>
+                    <div class="form-control">
+                        <label for="title">Ngày sinh</label>
+                        <input class="" type="date" name="doB">
+                    </div>
+                    <div class="form-control">
+                        <label for="title">Hệ số lương</label>
+                        <input class="" type="text" name="salaryScale">
+                    </div>
+                    <div class="form-control">
+                        <label for="title">Ngày vào công ty</label>
+                        <input class="" type="date" name="startDate">
+                    </div>
+                    <div class="form-control">
+                        <label for="title">Phòng ban</label>
+                        <input class="" type="text" name="department">
+                    </div>
+                    <div class="form-control">
+                        <label for="image">Image</label>
+                        <input type="file" name="image" id="image">
+                    </div>
+                    <button class="btn">Đăng ký</button>
+                </form>
+            </div>
+
+        </div>
+    </body>

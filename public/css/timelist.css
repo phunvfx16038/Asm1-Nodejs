@@ -1,0 +1,25 @@
+p {
+    margin: 8px;
+}
+
+#selectMonth {
+    padding: 8px
+}
+
+.btn {
+    padding: 5px;
+    background-color: rgb(80, 248, 80);
+    border: none;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 18px;
+}
+
+.row {
+    display: flex;
+    margin-top: 20px;
+}
+
+.column h2 {
+    margin: 0;
+}

@@ -1,0 +1,50 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/checkin.css">
+    </head>
+
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+            <div class="container">
+                <%if(checkout){%>
+                    <h2>Danh sách các lượt đăng ký làm </h2>
+                    <table>
+                        <tr>
+                            <td>STT</td>
+                            <td>Thời gian bắt đầu</td>
+                            <td>Thời gian kết thúc</td>
+                            <td>Nơi làm việc</td>
+                            <td>Số giờ đã làm</td>
+                        </tr>
+                        <% lists.forEach(function(list,index){ %>
+                            <tr>
+                                <td>
+                                    <%= index + 1%>
+                                </td>
+                                <td>
+                                    <%= list.startWork%>
+                                </td>
+                                <td>
+                                    <%= list.endWork%>
+                                </td>
+                                <td>
+                                    <%= list.workPlace %>
+                                </td>
+                                <td class="time">
+                                    <%= covertTimeFunction(list.workTime) %>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </table>
+
+                    <p>Tổng thời gian làm việc: <%=covertTimeFunction(totalWorkedTime)%>
+                    </p>
+                    <%}else{%>
+                        <p>Lượt làm việc gần nhất của bạn đã bị hủy bỏ vì bạn quên chọn "Kết thúc làm " của lần gần
+                            nhất. </p>
+                        <p>Vui lòng liên hệ quản lý để biết thêm chi tiết.</p>
+                        <%}%>
+
+            </div>
+
+            <%- include('../includes/end.ejs') %>
