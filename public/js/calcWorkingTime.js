@@ -11,7 +11,6 @@ const workingTime = (startTime, endTime) => {
   const hours = diff["hours"];
   const totalTime =
     parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
-
   return totalTime;
   // for (let i = 0; i < intervals.length; i++) {
   //   let time = diff[intervals[i]];

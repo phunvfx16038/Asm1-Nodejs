@@ -1,0 +1,152 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/form.css">
+    <link rel="stylesheet" href="/css/checkin.css">
+    <link rel="stylesheet" href="/css/timelist.css">
+    </head>
+    <style>
+        .edit {
+            margin-bottom: 10px;
+        }
+
+        .edit input {
+            padding: 5px
+        }
+
+        .border {
+            border: none;
+            outline: none;
+        }
+    </style>
+
+    <body>
+        <%- include('../includes/navigation.ejs',{role:role}) %>
+            <div class="container">
+                <%if(timelist){%>
+                    <h2>Thông tin giờ làm của <%= name%>
+                    </h2>
+                    <div>
+                        <%if(timesheet){%>
+                            <table>
+                                <tr>
+                                    <td>Ngày</td>
+                                    <td>Ngày nghỉ phép</td>
+                                    <td>Số giờ làm trong ngày</td>
+                                    <td>Số giờ làm thêm </td>
+                                    <td>Thời gian bắt đầu</td>
+                                    <td>Thời gian kết thúc</td>
+                                    <td>Nơi làm việc</td>
+                                    <td>Số giờ đã làm</td>
+                                </tr>
+                                <% timesheet.forEach(function(items){ %>
+                                    <tr>
+                                        <td rowspan="<%= items.worksheet.length + 1%>">
+                                            <%= items.day%>
+                                        </td>
+                                        <td rowspan="<%= items.worksheet.length + 1%>">
+                                            <%if(absent.length !==0){%>
+                                                <p class="time">
+                                                    <% absent.forEach(function(items){ %>
+                                                        <% items.date.forEach(function(item){%>
+                                                            <p>
+                                                                <%=item.day%>
+                                                            </p>
+                                                            <%})%>
+                                                                <%})%>
+                                                </p>
+                                                <%}else{%>
+                                                    <p class="time">
+                                                        Chưa đăng ký ngày nghỉ phép
+
+                                                    </p>
+                                                    <%}%>
+                                        </td>
+                                        <td rowspan="<%= items.worksheet.length + 1%>">
+                                            <%=covertTimeFunction(items.totalWorkTimeInDay)%>
+                                        </td>
+                                        <td rowspan="<%= items.worksheet.length + 1%>">
+                                            <%=covertTimeFunction(items.overTimeInDay)%>
+                                        </td>
+                                    </tr>
+                                    <%if(items.worksheet.length==0){%>
+                                        <tr>
+                                            <td colspan="6">Chưa đang ký giờ làm </td>
+                                        </tr>
+                                        <%}else{%>
+                                            <%items.worksheet.forEach(function(item){%>
+                                                <form action="/confirmTimesheet/<%= items.staff.staffId%>"
+                                                    method="POST">
+                                                    <tr>
+                                                        <input type="hidden" name="timeSheetId"
+                                                            value="<%=items._id%>" />
+                                                        <input type="hidden" name="workSheetId" value="<%=item._id%>" />
+
+                                                        <td>
+                                                            <div class="edit">
+                                                                <%if(item.confirmState){%>
+                                                                    <input type="text" name="startWorkConfirm"
+                                                                        value="<%=item.startWork%>" class="border"
+                                                                        readonly />
+                                                                    <%}else{%>
+                                                                        <input type="text" name="startWorkConfirm"
+                                                                            value="<%=item.startWork%>" />
+                                                                        <%}%>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="edit">
+                                                                <%if(item.confirmState){%>
+                                                                    <input type="text" name="endWorkConfirm"
+                                                                        value="<%=item.endWork%>" class="border"
+                                                                        readonly />
+                                                                    <%}else{%>
+                                                                        <input type="text" name="endWorkConfirm"
+                                                                            value="<%=item.endWork%>" />
+                                                                        <%}%>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <%=item.workPlace%>
+                                                        </td>
+                                                        <td>
+                                                            <%=covertTimeFunction(item.workTime)%>
+                                                        </td>
+                                                        <td>
+                                                            <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+                                                            <button>Xác nhận</button>
+                                                        </td>
+                                                    </tr>
+                                                </form>
+                                                <%})%>
+                                                    <%}%>
+                                                        <%})%>
+                            </table>
+                            <%}%>
+                    </div>
+                    <section class="pagination">
+                        <% if (currentPage !==1 && previousPage !==1) { %>
+                            <a href="?page=1">1</a>
+                            <% } %>
+                                <% if (hasPreviousPage) { %>
+                                    <a href="?page=<%= previousPage %>">
+                                        <%= previousPage %>
+                                    </a>
+                                    <% } %>
+                                        <a href="?page=<%= currentPage %>" class="active">
+                                            <%= currentPage %>
+                                        </a>
+                                        <% if (hasNextPage) { %>
+                                            <a href="?page=<%= nextPage %>">
+                                                <%= nextPage %>
+                                            </a>
+                                            <% } %>
+                                                <% if (lastPage !==currentPage && nextPage !==lastPage) { %>
+                                                    <a href="?page=<%= lastPage %>">
+                                                        <%= lastPage %>
+                                                    </a>
+                                                    <% } %>
+                    </section>
+                    <%}else{%>
+                        Chưa đăng ký giờ làm
+                        <%}%>
+                            <%- include('../includes/end.ejs') %>

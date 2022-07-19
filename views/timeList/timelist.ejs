@@ -7,67 +7,125 @@
     </head>
 
     <body>
-        <%- include('../includes/navigation.ejs') %>
+        <%- include('../includes/navigation.ejs',{role:role}) %>
             <div class="container">
                 <%if(timelist){%>
-                    <div>
-                        <h2>Thông tin giờ làm</h2>
+                    <div class="row">
+                        <div class="col">
+                            <h2>Thông tin giờ làm</h2>
+                        </div>
+    
                     </div>
+
                     <div>
                         <%if(timesheet){%>
-                            <p>
-                                Ngày: <%= date%>
-                            </p>
-                            <p>
-                                Thời gian bắt đầu: <%= currentWorkSheet.startWork%>
-                            </p>
-                            <p>
-                                Thời gian kết thúc: <%= currentWorkSheet.endWork%>
-                            </p>
-                            <p>
-                                Nơi làm việc: <%= currentWorkSheet.workPlace %>
-                            </p>
-                            <%if(currentWorkSheet.workTime){%>
-                                <p class="time">
-                                    Số giờ đã làm: <%= covertTimeFunction(currentWorkSheet.workTime) %>
-                                </p>
-                                <%}else{%>
-                                    <p class="time">
-                                        Số giờ đã làm: Chưa kết thúc
-                                    </p>
-                                    <%}%>
-
-                                        <%if(absent.length !==0){%>
-                                            <p class="time">
-                                                Các ngày đã nghỉ: <% absent.forEach(function(items){ %>
-                                                    <% items.date.forEach(function(item){%>
-                                                        <p>
-                                                            <%=item.day%>
-                                                        </p>
-                                                        <%})%>
-                                                            <%})%>
-                                            </p>
-                                            <%}else{%>
-                                                <p class="time">
-                                                    Các ngày đã nghỉ: Chưa đăng ký ngày nghỉ phép
-
+                            <table>
+                                <tr>
+                                    <td>Ngày</td>
+                                    <td>Thời gian bắt đầu</td>
+                                    <td>Thời gian kết thúc</td>
+                                    <td>Nơi làm việc</td>
+                                    <td>Số giờ đã làm</td>
+                                    <td>Số giờ làm trong ngày</td>
+                                    <td>Số giờ làm thêm </td>
+                                    <td>Ngày nghỉ phép</td>
+                                </tr>
+                                <% timesheet.forEach(function(items){ %>
+                                    <tr>
+                                        <td>
+                                            <%= items.day%>
+                                        </td>
+                                        <td>
+                                            <%items.worksheet.forEach(function(item){%>
+                                                <p>
+                                                    <%=item.startWork%>
                                                 </p>
-                                                <%}%>
-                                                    <%if(timesheet.totalTimeInDay>= 28800 ){%>
-                                                        <p>
-                                                            Số giờ làm trong ngày: <%=
-                                                                covertTimeFunction(timesheet.totalTimeInDay)%>
-                                                        </p>
+                                                <%})%>
+                                        </td>
+                                        <td>
+                                            <%items.worksheet.forEach(function(item){%>
+                                                <%if(item.endWork){%>
+                                                    <p>
+                                                        <%=item.endWork%>
+                                                    </p>
+                                                    <%}else{%>
+                                                        <p>Đang làm việc</p>
                                                         <%}%>
-                                                            <%if(timesheet.overTimeInDay !==0 ){%>
-                                                                <p>
-                                                                    Số giờ làm thêm: <%=
-                                                                        covertTimeFunction(timesheet.overTimeInDay)%>
-                                                                </p>
-                                                                <%}%>
-                                                                    <%}%>
-                    </div>
+                                                            <%})%>
+                                        </td>
+                                        <td>
+                                            <%items.worksheet.forEach(function(item){%>
+                                                <p>
+                                                    <%= item.workPlace%>
+                                                </p>
+                                                <%})%>
+                                        </td>
+                                        <td>
+                                            <%items.worksheet.forEach(function(item){%>
+                                                <%if(item.workTime){%>
+                                                    <p>
+                                                        <%= covertTimeFunction(item.workTime)%>
+                                                    </p>
+                                                    <%}%>
+                                                        <%})%>
+                                        </td>
 
+                                        <td>
+                                            <%if(items.totalWorkTimeInDay>= 28800){%>
+                                                <%= covertTimeFunction(items.totalWorkTimeInDay)%>
+                                                    <%}%>
+                                        </td>
+                                        <td>
+                                            <%if(items.overTimeInDay> 0){%>
+                                                <%=covertTimeFunction(items.overTimeInDay)%>
+                                                    <%}%>
+                                        </td>
+                                        <td>
+                                            <%if(absent.length !==0){%>
+                                                <p class="time">
+                                                    <% absent.forEach(function(items){ %>
+                                                        <% items.date.forEach(function(item){%>
+                                                            <p>
+                                                                <%=item.day%>
+                                                            </p>
+                                                            <%})%>
+                                                                <%})%>
+                                                </p>
+                                                <%}else{%>
+                                                    <p class="time">
+                                                        Chưa đăng ký ngày nghỉ phép
+
+                                                    </p>
+                                                    <%}%>
+                                        </td>
+                                    </tr>
+                                    <%})%>
+                            </table>
+                            <%}%>
+                    </div>
+                    <section class="pagination">
+                        <% if (currentPage !==1 && previousPage !==1) { %>
+                            <a href="?page=1">1</a>
+                            <% } %>
+                                <% if (hasPreviousPage) { %>
+                                    <a href="?page=<%= previousPage %>">
+                                        <%= previousPage %>
+                                    </a>
+                                    <% } %>
+                                        <a href="?page=<%= currentPage %>" class="active">
+                                            <%= currentPage %>
+                                        </a>
+                                        <% if (hasNextPage) { %>
+                                            <a href="?page=<%= nextPage %>">
+                                                <%= nextPage %>
+                                            </a>
+                                            <% } %>
+                                                <% if (lastPage !==currentPage && nextPage !==lastPage) { %>
+                                                    <a href="?page=<%= lastPage %>">
+                                                        <%= lastPage %>
+                                                    </a>
+                                                    <% } %>
+                    </section>
                     <div id="showSalary">
 
                         <form action="/timelist" method="POST">
@@ -87,12 +145,12 @@
                                 <option value="11">Tháng 11</option>
                                 <option value="12">Tháng 12</option>
                             </select>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken%>">
                             <button class="btn">Xem</button>
                         </form>
 
                         <div id="salary">
                             <h2>Thông tin bảng lương</h2>
-
                             <table>
                                 <tr>
                                     <td>Hệ số lương</td>

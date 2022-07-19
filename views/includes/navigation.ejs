@@ -15,18 +15,23 @@
             <li class="main-header__item">
                 <a class="<%= path === '/covid' ? 'active' : '' %>" href="/covid">Thông tin Covid</a>
             </li>
+            <%if(role==="Admin"){%>
+                <li class="main-header__item">
+                    <a class="<%= path === '/confirm' ? 'active' : '' %>" href="/confirmTimesheet">Xác nhận giờ làm</a>
+                </li>
+                <%}%>
         </ul>
     </nav>
-    <%if(path==='/timelist' ){%>
-        <div class="column">
-            <form action="/timelist/search" method="POST">
-                <div class="search">
-                    <input type="text" name="search">
-                    <button>Search</button>
-                </div>
-            </form>
-        </div>
-        <%}%>
+
+    <div class="logout-section">
+        <form action="/" method="POST">
+            <div class="search">
+                <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+                <button class="logout">Đăng xuất</button>
+            </div>
+        </form>
+    </div>
+
 </header>
 
 <nav class="mobile-nav">

@@ -8,7 +8,7 @@ exports.getHomePage = (req, res, next) => {
   const staffId = req.staff.id;
   Staff.findById(staffId)
     .then((staff) => {
-      res.render("home", {
+      res.render("timesheet/index", {
         pageTitle: "Trang chủ",
         staff: staff,
         path: "/",
@@ -16,6 +16,7 @@ exports.getHomePage = (req, res, next) => {
         lists: null,
         totalWorkedTime: 0,
         covertTimeFunction: workingTime.covertSecondsToHoursAndMin,
+        role: req.staff.role,
       });
     })
     .catch((err) => {
@@ -26,6 +27,9 @@ exports.getHomePage = (req, res, next) => {
 // #region CHECK IN
 
 exports.getCheckin = (req, res, next) => {
+  let today = new Date();
+  let currentDate = parseInt(today.getDate());
+  const month = parseInt(today.getMonth() + 1);
   const staffId = req.staff._id;
   TimeSheet.find({
     staffId: staffId,
@@ -35,11 +39,13 @@ exports.getCheckin = (req, res, next) => {
   res.render("timesheet/checkin", {
     pageTitle: "Đăng ký giờ làm",
     path: "/",
+    role: req.staff.role,
   });
 };
 
 exports.postCheckin = (req, res, next) => {
   const staffId = req.staff._id;
+
   const workPlace = req.body.workplace;
   let today = new Date();
   let currentDate = parseInt(today.getDate());
@@ -54,13 +60,13 @@ exports.postCheckin = (req, res, next) => {
       staff.save();
 
       TimeSheet.find({
-        staffId: staffId,
+        "staff.staffId": staffId,
         month: month,
         day: currentDate,
       })
         .then((timesheet) => {
           //if timesheet is not exist then create new one
-          if (!timesheet[0]) {
+          if (timesheet.length == 0) {
             const worksheetData = {
               startWork: time,
               workPlace: workPlace,
@@ -103,6 +109,7 @@ exports.postCheckin = (req, res, next) => {
             path: "/",
             name: timesheet.staff.name,
             timesheet: currentTimesheet,
+            role: req.staff.role,
           });
         });
     })
@@ -119,17 +126,20 @@ exports.getCheckout = (req, res, next) => {
   let today = new Date();
   let currentDate = parseInt(today.getDate());
   const month = parseInt(today.getMonth() + 1);
-  TimeSheet.find({ staffId: staffId, month: month, day: currentDate }).then(
-    (timesheet) => {
-      res.render("timesheet/checkout", {
-        pageTitle: "Kết thúc công việc",
-        path: "/",
-        lists: timesheet[0].worksheet,
-        covertTimeFunction: workingTime.covertSecondsToHoursAndMin,
-        totalWorkedTime: timesheet[0].totalWorkTimeInDay,
-      });
-    }
-  );
+  TimeSheet.find({
+    "staff.staffId": staffId,
+    month: month,
+    day: currentDate,
+  }).then((timesheet) => {
+    res.render("timesheet/checkout", {
+      pageTitle: "Kết thúc công việc",
+      path: "/",
+      lists: timesheet[0].worksheet,
+      covertTimeFunction: workingTime.covertSecondsToHoursAndMin,
+      totalWorkedTime: timesheet[0].totalWorkTimeInDay,
+      role: req.staff.role,
+    });
+  });
 };
 
 exports.postCheckout = (req, res, next) => {
@@ -142,7 +152,7 @@ exports.postCheckout = (req, res, next) => {
 
   //remove worksheet without checkout in same day
   TimeSheet.find({
-    staffId: staffId,
+    "staff.staffId": staffId,
     month: month,
     day: { $lt: currentDate },
     "worksheet.endWork": null,
@@ -166,12 +176,13 @@ exports.postCheckout = (req, res, next) => {
               pageTitle: "Kết thúc công việc",
               path: "/",
               checkout: false,
+              role: req.staff.role,
             });
           });
       } else {
         //checkout the timesheet in currentday
         TimeSheet.find({
-          staffId: staffId,
+          "staff.staffId": staffId,
           month: month,
           day: currentDate,
         })
@@ -258,7 +269,7 @@ exports.postCheckout = (req, res, next) => {
                 const totalWorkTimeInDay = workingTime.totalWorkedTime(
                   timesheet.worksheet
                 );
-                const overTimeInDay = 0;
+                let overTimeInDay = 0;
                 //overtime = total work time - standard time (8 hours = 28800 seconds)
                 if (totalWorkTimeInDay > 28800) {
                   overTimeInDay = totalWorkTimeInDay - 28800;
@@ -279,6 +290,7 @@ exports.postCheckout = (req, res, next) => {
                   lists: timesheet.worksheet,
                   covertTimeFunction: workingTime.covertSecondsToHoursAndMin,
                   totalWorkedTime: timesheet.totalWorkTimeInDay,
+                  role: req.staff.role,
                 });
               })
               .catch((err) => console.log(err));
@@ -303,6 +315,7 @@ exports.getAbsent = (req, res, next) => {
           path: "/",
           absent: absent,
           annualLeave: absent.staffId.annualLeave,
+          role: req.staff.role,
         });
       });
     })
@@ -335,7 +348,7 @@ exports.postAbsent = (req, res, next) => {
 
   Staff.findById(staffId)
     .then((staff) => {
-      const annualLeave = staff.annualLeave;
+      const annualLeave = staff.annualLeave * 8;
       if (annualLeave < totalHourAbsent) {
         Absent.find(staffId).then((absent) => {
           const absentIndex = absent.length - 1;
@@ -346,15 +359,16 @@ exports.postAbsent = (req, res, next) => {
               path: "/",
               absent: absent,
               annualLeave: absent.staffId.annualLeave,
+              role: req.staff.role,
             });
           });
         });
       } else {
-        // calculate annualLeave
+        // calculate annualLeave (1 day off with 8hours => 15 days off with 120hours)
         const annualLeaveRemain = annualLeave - totalHourAbsent;
 
         //update annualLeave after create new absent
-        staff.annualLeave = annualLeaveRemain;
+        staff.annualLeave = annualLeaveRemain / 8;
         staff.save();
 
         //create new absent
@@ -363,20 +377,19 @@ exports.postAbsent = (req, res, next) => {
           date: dayOff,
           staffId: mongoose.Types.ObjectId(staffId),
         });
-        return absent.save();
-      }
-    })
-    .then((absent) => {
-      absent.populate("staffId").then((absent) => {
-        console.log(absent);
-        res.render("timesheet/absent", {
-          pageTitle: "Absent",
-          leave: true,
-          path: "/",
-          absent: absent,
-          annualLeave: absent.staffId.annualLeave,
+        return absent.save().then((absent) => {
+          absent.populate("staffId").then((absent) => {
+            res.render("timesheet/absent", {
+              pageTitle: "Absent",
+              leave: true,
+              path: "/",
+              absent: absent,
+              annualLeave: absent.staffId.annualLeave,
+              role: req.staff.role,
+            });
+          });
         });
-      });
+      }
     })
     .catch((err) => {
       console.log(err);

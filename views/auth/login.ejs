@@ -1,4 +1,4 @@
-<%- include('./includes/head.ejs') %>
+<%- include('../includes/head.ejs') %>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/form.css">
     <link rel="stylesheet" href="/css/info.css">
@@ -7,17 +7,24 @@
     <body>
         <div class="container">
             <div class="wrap">
-                <form action="/login" class="info-form" method="POST">
-                    <div class="form-control">
-                        <label for="">Email</label>
-                        <input name="email"></input>
+                <% if (errorMessage) { %>
+                    <div class="user-message user-message--error error">
+                        <%= errorMessage %>
                     </div>
-                    <div class="form-control">
-                        <label for="">Mật khẩu</label>
-                        <input name="password"></input>
-                    </div>
-                    <button class="btn">Đăng nhập</button>
-                </form>
+                    <% } %>
+                        <form action="/" class="info-form" method="POST">
+                            <div class="form-control">
+                                <label for="">Email</label>
+                                <input name="email"></input>
+                            </div>
+                            <div class="form-control">
+                                <label for="">Mật khẩu</label>
+                                <input name="password" type="password"></input>
+                            </div>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+                            <button class="btn">Đăng nhập</button>
+                        </form>
+                        <p class="info-form"><a href="/register">Create new Account</a></p>
             </div>
 
         </div>

@@ -22,6 +22,10 @@ const timeSheet = new Schema({
       workTime: {
         type: Number,
       },
+      confirmState: {
+        type: Boolean,
+        default: false,
+      },
     },
   ],
   staff: {

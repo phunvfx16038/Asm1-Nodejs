@@ -3,13 +3,21 @@ const Absent = require("../models/absent");
 const workingTime = require("../public/js/calcWorkingTime");
 
 exports.getTimeList = (req, res, next) => {
-  let today = new Date();
-  let currentDate = today.getDate();
-  const month = today.getMonth() + 1;
+  const ITEM_PER_PAGE = 20;
+  const page = +req.query.page || 1;
   const staffId = req.staff._id;
 
-  TimeSheet.find({ staffId: staffId, month: month, day: currentDate })
+  let totalItems;
+  TimeSheet.find({ "staff.staffId": staffId })
+    .countDocuments()
+    .then((numberCount) => {
+      totalItems = numberCount;
+      return TimeSheet.find({ "staff.staffId": staffId })
+        .skip((page - 1) * ITEM_PER_PAGE)
+        .limit(ITEM_PER_PAGE);
+    })
     .then((timesheet) => {
+      const timesheets = [...timesheet];
       //check timesheet exist
       if (timesheet.length != 0) {
         const timesheetIndex = timesheet.length - 1;
@@ -24,7 +32,7 @@ exports.getTimeList = (req, res, next) => {
               pageTitle: "Tra cứu thông tin giờ làm",
               path: "/timelist",
               currentWorkSheet: currentWorkSheet,
-              timesheet: timesheet,
+              timesheet: timesheets,
               date: currentDay,
               absent: absent,
               timelist: true,
@@ -33,6 +41,14 @@ exports.getTimeList = (req, res, next) => {
               salaryScale: null,
               calTotalOverTimeInMonth: null,
               covertTimeFunction: workingTime.covertSecondsToHoursAndMin,
+              totalItems: totalItems,
+              currentPage: page,
+              hasNextPage: ITEM_PER_PAGE * page < totalItems,
+              hasPreviousPage: page < 1,
+              nextPage: page + 1,
+              previousPage: page - 1,
+              lastPage: Math.ceil(totalItems / ITEM_PER_PAGE),
+              role: req.staff.role,
             });
           });
         });
@@ -41,16 +57,9 @@ exports.getTimeList = (req, res, next) => {
         res.render("timeList/timelist", {
           pageTitle: "Tra cứu thông tin giờ làm",
           path: "/timelist",
-          currentWorkSheet: null,
-          timesheet: null,
-          date: null,
-          absent: null,
           timelist: false,
-          salaryScale: null,
-          salary: null,
-          missingTime: null,
-          calTotalOverTimeInMonth: null,
-          covertTimeFunction: workingTime.covertSecondsToHoursAndMin,
+          timesheet: null,
+          role: req.staff.role,
         });
       }
     })
@@ -58,91 +67,97 @@ exports.getTimeList = (req, res, next) => {
 };
 
 exports.postTimeList = (req, res, next) => {
+  const ITEM_PER_PAGE = 20;
   const monthSelected = req.body.selectMonth;
   const staffId = req.staff._id;
-  TimeSheet.find({ month: monthSelected }).then((timesheet) => {
-    //check timesheet exist
-    if (timesheet.length != 0) {
-      //calculate total Work time of staff
-      const calTotalWorkTimeInMonth = timesheet.reduce(
-        (totalTimeInMonth, current) => {
-          return (totalTimeInMonth =
-            totalTimeInMonth + current.totalWorkTimeInDay);
-        },
-        0
-      );
+  const page = +req.query.page || 1;
+  let totalItems;
 
-      //calculate overtime of staff
-      const calTotalOverTimeInMonth = timesheet.reduce(
-        (totalOverTimeInMonth, current) => {
-          return (totalOverTimeInMonth =
-            totalOverTimeInMonth + current.overTimeInDay);
-        },
-        0
-      );
-      //calculate standard worktime in month
-      const standardTimeInMonth = timesheet.length * 8 * 3600;
+  TimeSheet.find({ staffId: staffId })
+    .countDocuments()
+    .then((numberCount) => {
+      totalItems = numberCount;
+      return TimeSheet.find({ "staff.staffId": staffId })
+        .skip((page - 1) * ITEM_PER_PAGE)
+        .limit(ITEM_PER_PAGE);
+    })
+    .then((timesheets) => {
+      TimeSheet.find({ month: monthSelected }).then((timesheet) => {
+        //check timesheet exist
+        if (timesheet.length != 0) {
+          //calculate total Work time of staff
+          const calTotalWorkTimeInMonth = timesheet.reduce(
+            (totalTimeInMonth, current) => {
+              return (totalTimeInMonth =
+                totalTimeInMonth + current.totalWorkTimeInDay);
+            },
+            0
+          );
 
-      //calculate missing time
-      const missingTime = standardTimeInMonth - calTotalWorkTimeInMonth;
+          //calculate overtime of staff
+          const calTotalOverTimeInMonth = timesheet.reduce(
+            (totalOverTimeInMonth, current) => {
+              return (totalOverTimeInMonth =
+                totalOverTimeInMonth + current.overTimeInDay);
+            },
+            0
+          );
+          //calculate standard worktime in month
+          const standardTimeInMonth = timesheet.length * 8 * 3600;
 
-      //get current timesheet index
-      const currentTimesheetIndex = timesheet.length - 1;
+          //calculate missing time
+          const missingTime = standardTimeInMonth - calTotalWorkTimeInMonth;
 
-      timesheet[currentTimesheetIndex]
-        .populate("staff.staffId")
-        .then((timesheet) => {
-          const currentDay = timesheet.day + "/" + timesheet.month;
-          const currentWorkSheetIndex = timesheet.worksheet.length - 1;
-          const currentWorkSheet = timesheet.worksheet[currentWorkSheetIndex];
+          //get current timesheet index
+          const currentTimesheetIndex = timesheet.length - 1;
 
-          //calculate salary
-          const salary =
-            timesheet.staff.staffId.salaryScale * 3000000 +
-            //convert calTotalOverTimeInMonth and missingTime to hours
-            (calTotalOverTimeInMonth / 3600 - missingTime / 3600) * 200000;
+          timesheet[currentTimesheetIndex]
+            .populate("staff.staffId")
+            .then((timesheet) => {
+              const currentDay = timesheet.day + "/" + timesheet.month;
+              const currentWorkSheetIndex = timesheet.worksheet.length - 1;
+              const currentWorkSheet =
+                timesheet.worksheet[currentWorkSheetIndex];
 
-          Absent.find({ staffId: staffId }).then((absent) => {
-            res.render("timeList/timelist", {
-              pageTitle: "Tra cứu thông tin giờ làm",
-              path: "/timelist",
-              currentWorkSheet: currentWorkSheet,
-              timesheet: timesheet,
-              date: currentDay,
-              absent: absent,
-              salaryScale: timesheet.staff.staffId.salaryScale,
-              timelist: true,
-              salary: salary.toFixed(2),
-              missingTime: missingTime,
-              calTotalOverTimeInMonth: calTotalOverTimeInMonth,
-              covertTimeFunction: workingTime.covertSecondsToHoursAndMin,
+              //calculate salary
+              const salary =
+                timesheet.staff.staffId.salaryScale * 3000000 +
+                (calTotalOverTimeInMonth / 3600 - missingTime / 3600) * 200000;
+              //convert calTotalOverTimeInMonth and missingTime to hours
+
+              Absent.find({ staffId: staffId }).then((absent) => {
+                res.render("timeList/timelist", {
+                  pageTitle: "Tra cứu thông tin giờ làm",
+                  path: "/timelist",
+                  currentWorkSheet: currentWorkSheet,
+                  timesheet: timesheets,
+                  date: currentDay,
+                  absent: absent,
+                  salaryScale: timesheet.staff.staffId.salaryScale,
+                  timelist: true,
+                  salary: salary.toFixed(2),
+                  missingTime: missingTime,
+                  calTotalOverTimeInMonth: calTotalOverTimeInMonth,
+                  covertTimeFunction: workingTime.covertSecondsToHoursAndMin,
+                  totalItems: totalItems,
+                  currentPage: page,
+                  hasNextPage: ITEM_PER_PAGE * page < totalItems,
+                  hasPreviousPage: page < 1,
+                  nextPage: page + 1,
+                  previousPage: page - 1,
+                  lastPage: Math.ceil(totalItems / ITEM_PER_PAGE),
+                  role: req.staff.role,
+                });
+              });
             });
+        } else {
+          res.render("timeList/timelist", {
+            pageTitle: "Tra cứu thông tin giờ làm",
+            path: "/timelist",
+            timelist: false,
+            role: req.staff.role,
           });
-        });
-    } else {
-      res.render("timeList/timelist", {
-        pageTitle: "Tra cứu thông tin giờ làm",
-        path: "/timelist",
-        currentWorkSheet: null,
-        timesheet: null,
-        date: null,
-        absent: null,
-        timelist: false,
-        salary: null,
-        salaryScale: null,
-        missingTime: null,
-        calTotalOverTimeInMonth: null,
-        covertTimeFunction: workingTime.covertSecondsToHoursAndMin,
+        }
       });
-    }
-  });
-};
-
-exports.postSearch = (req, res, next) => {
-  const search = req.body.search;
-  TimeSheet.find({
-    $or: [{ day: search }, { month: search }],
-  }).then((result) => {
-    console.log("result line 149:" + result);
-  });
+    });
 };

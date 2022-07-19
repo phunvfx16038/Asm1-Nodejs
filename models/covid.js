@@ -12,10 +12,13 @@ const covidSchema = new Schema({
     },
   ],
   isCovid: { type: Boolean, default: false },
-  staffId: {
-    type: Schema.Types.ObjectId,
-    ref: "Staff",
-    require: true,
+  staff: {
+    name: { type: String },
+    staffId: {
+      type: Schema.Types.ObjectId,
+      ref: "Staff",
+      require: true,
+    },
   },
 });
 

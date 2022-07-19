@@ -1,8 +1,19 @@
 p {
     margin: 8px;
 }
+a{
+    text-decoration: none;
+    color:black
+}
 
-#selectMonth {
+a:hover{
+    cursor: pointer;
+    color:aqua
+}
+#listStaff{
+    margin-top:50px
+}
+#selectMonth,#selectStaff {
     padding: 8px
 }
 
@@ -18,8 +29,13 @@ p {
 .row {
     display: flex;
     margin-top: 20px;
+    justify-content: flex-start;
 }
 
-.column h2 {
+.col{
+    width: 50%;
+}
+
+.col h2 {
     margin: 0;
 }

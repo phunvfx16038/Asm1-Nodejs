@@ -5,7 +5,9 @@
 .wrap h2 {
     text-align: center;
 }
-
+.wrap .error{
+    width: 25rem;
+} 
 .info-form{
     width: 20rem;
     max-width: 90%;
@@ -24,4 +26,10 @@
 input{
     padding:10px
 }
-
+p{
+    margin-top:15px !important;
+}
+a{
+    text-decoration: none;
+    color:palevioletred;
+}

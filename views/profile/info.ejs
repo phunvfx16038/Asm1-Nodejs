@@ -6,12 +6,12 @@
     </head>
 
     <body>
-        <%- include('../includes/navigation.ejs') %>
+        <%- include('../includes/navigation.ejs',{role:role}) %>
             <div class="container">
                 <div class="wrap">
                     <h2>Thông tin cá nhân</h2>
                     <div class="wrap-info">
-                        <form class="info-form" action="/profile/info" method="POST">
+                        <form class="info-form" action="/profile/info" method="POST" enctype="multipart/form-data">
                             <div class="form-control">
                                 <label for="title">Mã nhân viên</label>
                                 <input class="" type="text" name="id" value="<%= staff._id%>" readonly>
@@ -44,8 +44,9 @@
                             </div>
                             <div class="form-control">
                                 <label for="">Image</label>
-                                <input type="text" name="imageFile" id="imageFile" value="<%= staff.image%>">
+                                <input type="file" name="imageFile" id="imageFile">
                             </div>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken%>">
                             <button class="btn">Submit</button>
                         </form>
                     </div>

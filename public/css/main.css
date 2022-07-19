@@ -146,7 +146,6 @@
 
   .search {
     display: inline-block;
-
 }
 
 .search input {
@@ -154,6 +153,56 @@
     padding: 4px 10px;
 }
 
+.logout-section{
+  margin-left:auto;
+  margin-right:25px;
+}
+.logout{
+  background-color: #00695c;
+  color:white;
+  border:none;
+  
+}
+.logout:hover{
+  cursor: pointer;
+  color:#ffeb3b
+}
+
+.user-message {
+  margin: auto;
+  width: 90%;
+  border: 1px solid #4771fa;
+  padding: 0.5rem;
+  border-radius: 3px;
+  background: #b9c9ff;
+  text-align: center;
+}
+
+.user-message--error {
+  border-color: red;
+  background: rgb(255, 176, 176);
+  color: red;
+}
+
+.pagination {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.pagination a {
+  text-decoration: none;
+  color: #00695c;
+  padding: 0.5rem;
+  border: 1px solid #00695c;
+  margin: 0 1rem;
+}
+
+.pagination a:hover,
+.pagination a:active,
+.pagination a.active {
+  background: #00695c;
+  color: white;
+}
 /* responsive */
 @media screen and (max-width: 768px){
   .container{
@@ -172,16 +221,10 @@
   .column{
     margin-left:10px;
   }
-  /* .row{
-    flex-direction: column;
+  .user-message {
+    width: 30rem;
   }
-  .row .col{
-    width:100%;
-  }
-  .col input{
-    width:100%;
-    margin-top:10px;
-  } */
+ 
 }
 @media screen and (max-width: 640px){
     .container{

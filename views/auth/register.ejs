@@ -1,4 +1,4 @@
-<%- include('./includes/head.ejs') %>
+<%- include('../includes/head.ejs') %>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/form.css">
     <link rel="stylesheet" href="/css/info.css">
@@ -7,7 +7,7 @@
     <body>
         <div class="container">
             <div class="wrap">
-                <form action="/register" class="info-form" method="POST">
+                <form action="/register" class="info-form" method="POST" enctype="multipart/form-data">
                     <div class="form-control">
                         <label for="">Email</label>
                         <input name="email"></input>
@@ -37,9 +37,21 @@
                         <input class="" type="text" name="department">
                     </div>
                     <div class="form-control">
-                        <label for="image">Image</label>
-                        <input type="file" name="image" id="image">
+                        <label for="title">Role</label>
+                        <select name="role">
+                            <option value="Admin">Admin</option>
+                            <option value="Basic">Basic</option>
+                        </select>
                     </div>
+                    <div class="form-control">
+                        <label for="title">Email quản lý</label>
+                        <input class="" type="text" name="managerEmail">
+                    </div>
+                    <div class="form-control">
+                        <label for="image">Image</label>
+                        <input type="file" name="imageFile" id="image">
+                    </div>
+                    <input type="hidden" name="_csrf" value="<%= csrfToken%>">
                     <button class="btn">Đăng ký</button>
                 </form>
             </div>

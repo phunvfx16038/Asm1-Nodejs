@@ -1,4 +1,4 @@
-<%- include('./includes/head.ejs') %>
+<%- include('../includes/head.ejs') %>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/home.css">
     <link rel="stylesheet" href="/css/form.css">
@@ -9,13 +9,14 @@
     </head>
 
     <body>
-        <%- include('./includes/navigation.ejs') %>
+        <%- include('../includes/navigation.ejs',{role:role}) %>
             <div class="container">
                 <h2 class="title">Ứng dụng quản lý thời gian và lịch làm việc</h2>
                 <ul class="list">
                     <%if (staff.state){%>
                         <li class="list-item check-out">
                             <form action="/timesheet/checkout" method="POST">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken%>">
                                 <button class="btn-checout">Kết thúc làm</button>
                             </form>
                         </li>
@@ -23,9 +24,6 @@
                             <li class="list-item check-in"><a href="/">Điểm danh</a></li>
                             <%}%>
                                 <li class="list-item absent"><a href="/timesheet/absent">Nghỉ phép</a></li>
-                                <!-- <li class="list-item"><a href="/info">Thông tin cá nhân</a></li>
-                                <li class="list-item"><a href="/timelist">Giờ làm</a></li>
-                                <li class="list-item"><a href="/covidInfo">Thông tin Covid</a></li> -->
                 </ul>
                 <div>
                     <p>Trạng thái:
@@ -91,11 +89,8 @@
                                     <option value="Khách hàng">Khách hàng</option>
                                 </select>
                             </div>
-                            <% if(staff.state){ %>
-                                <button class="btn" disabled>Submit</button>
-                                <%} else {%>
-                                    <button class="btn">Submit</button>
-                                    <%}%>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+                            <button class="btn">Submit</button>
                         </form>
                     </div>
                 </div>
@@ -140,7 +135,7 @@
                                         <label for="">Lý do</label>
                                         <textarea name="reason" cols="30" rows="10"></textarea>
                                     </div>
-
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken%>">
                                     <button class="btn">Submit</button>
 
                                 </form>
@@ -154,4 +149,4 @@
 
     <script src="/js/showPopup.js"></script>
 
-    <%- include('./includes/end.ejs') %>
+    <%- include('../includes/end.ejs') %>
